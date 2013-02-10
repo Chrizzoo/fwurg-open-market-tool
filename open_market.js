@@ -16,12 +16,17 @@
 	 * transaction.
 	 */
 	var updateTotal = function() {
-		// we keep a running total
+		// we keep a running total for the tax
 		var total = 0;
+		
+		// another running total for the amount of goods
+		var goods_total = 0;
 		
 		// and then just run through the goods
 		$.each(goods, function(i, item) {
 			var sub_total = $('#amount' + i).val();
+			
+			goods_total += Math.abs(sub_total);
 			
 			sub_total *= (sub_total > 0 ? item.sell : item.buy);
 			
@@ -29,6 +34,8 @@
 			
 			total += sub_total;
 		});
+		
+		$('#goods_total').html(""+goods_total + ' ' + fwurg.icons.draw('(:om-trade)'));
 		
 		$('#tax_total').html("" + (total != 0 ? total.toFixed(3) : 0));
 		
@@ -72,6 +79,8 @@
 			// ...and closing with a nice total row.
 			$('#allGoods').append('<tr class="tRow"><td colspan="5" class="totalLine">Total:</td><td class="tax_td" id="tax_total">0</td></tr>');	
 			$('#allGoods').append('<tr class="tRow totalRow"><td colspan="5" id="taxText"></td><td class="tax_td" id="taxAmount">0</td></tr>');	
+			$('#allGoods').append('<tr class="tRow totalRow"><td colspan="5" class="totalLine">Open market capacity required:</td><td class="tax_td" id="goods_total">0</td></tr>');
+	
 			
 			// After we have created the table, attach a nice handler to all fields:
 			// $('input').change(updateTotal);
