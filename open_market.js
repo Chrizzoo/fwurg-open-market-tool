@@ -43,8 +43,53 @@
 		$('#taxText').html(total > 0 ? "You get from the open market: ": "You have to pay the open market: ");
 		$('#taxAmount').html(tax);
 		
+		// rebuild the template
+		updateDataBlocks(Math.floor(total));
 		
 	};
+	
+	var updateDataBlocks = function(total_tax) {
+		// template incoming trades.
+		var incomingTemplate = [];
+		// template outgoing trades.
+		var outgoingTemplate = [];
+		
+		incomingTemplate = incomingTemplate.concat(["<data !trade #From Open Market>", "To_ref: YOUR_SYSTEM_NAME", "From: Open Market"]);
+		outgoingTemplate = outgoingTemplate.concat(["<data !trade #To Open Market>", "To: Open Market", "From_ref: YOUR_SYSTEM_NAME"]);
+		
+		$.each(goods, function(i, item) {
+			var amount = $('#amount' + i).val();
+			
+			if (amount > 0) {
+				// selling to open market
+				outgoingTemplate = outgoingTemplate.concat([item.name+': '+amount]);
+				
+			}
+			else if(amount < 0) {
+				// buying from open market
+				var absolute_amount = Math.abs(amount);
+				incomingTemplate = incomingTemplate.concat([item.name+': '+absolute_amount]);
+			}			
+		});
+		// add the tax that you get or pay.
+		if (total_tax > 0) {
+			incomingTemplate = incomingTemplate.concat(['Tax: '+total_tax]);
+				
+		}
+		else {
+			outgoingTemplate = outgoingTemplate.concat(['Tax: '+Math.abs(total_tax)]);	
+		}
+		incomingTemplate = incomingTemplate.concat(['</data>', '']);
+		outgoingTemplate = outgoingTemplate.concat(['</data>', '']);
+		
+		$('#templates').remove();
+		
+		$('#allGoods').append('<tr id="templates" class="tRow totalRow"><td colspan="6" class="totalLine"><textarea id="templatearea"></textarea></td></tr>');
+		
+		var templates = incomingTemplate.concat(outgoingTemplate);
+		$('#templatearea').val(templates.join("\n"));
+		
+	}
 	
 	// We only muck around when the document is loaded
 	$(document).ready(function() {
